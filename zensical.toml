@@ -1,0 +1,86 @@
+[project]
+site_name = "Tele UI Pack"
+site_description = "The <tele-call> prebuilt call screen for Tele"
+repo_url = "https://github.com/cloudguys-io/tele-ui-pack"
+repo_name = "cloudguys-io/tele-ui-pack"
+docs_dir = "docs"
+site_dir = "site"
+copyright = "CloudGuys"
+nav = [
+  { "Overview" = "index.md" },
+  { "Getting started" = "getting-started.md" },
+  { "Your backend" = "backend.md" },
+  { "Usage" = [
+    { "Plain HTML" = "html.md" },
+    { "React and Next.js" = "react.md" },
+    { "Host controls" = "host-controls.md" },
+    { "Diagnostics" = "diagnostics.md" },
+  ] },
+  { "Customizing" = [
+    { "Theming" = "theming.md" },
+    { "Languages and labels" = "languages.md" },
+  ] },
+  { "Reference" = "reference.md" },
+  { "Browser support" = "browser-support.md" },
+  { "Development" = "development.md" },
+]
+
+# Hides the "Made with Zensical" line in the footer.
+[project.extra]
+generator = false
+
+[project.theme]
+language = "en"
+features = [
+  "content.code.annotate",
+  "content.code.copy",
+  "content.tabs.link",
+  "content.tooltips",
+  "navigation.footer",
+  "navigation.indexes",
+  "navigation.instant",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.top",
+  "navigation.tracking",
+  "search.highlight",
+  "toc.follow",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+md_in_html = {}
+toc.permalink = true
+pymdownx.details = {}
+pymdownx.highlight.anchor_linenums = true
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.inlinehilite = {}
+pymdownx.keys = {}
+pymdownx.mark = {}
+pymdownx.snippets = {}
+pymdownx.superfences.custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+pymdownx.tabbed.alternate_style = true
+pymdownx.tabbed.combine_header_slug = true
+pymdownx.tasklist.custom_checkbox = true
