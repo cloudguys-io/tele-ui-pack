@@ -6,6 +6,7 @@ import { acquire, canPickSpeaker, listDevices, mediaSupported, type DeviceIssue 
 import { dictionary, format, render, type Strings } from "./i18n.ts";
 import { styles } from "./styles.ts";
 import { ICONS, type IconName } from "./icon-paths.ts";
+import { arrange, togglePin } from "./stage.ts";
 import type { ReportDiagnostic } from "./diagnostics.ts";
 import {
   ALL_FEATURES, type Feature, type HistoryMessage, type JoinResponse, type Layout, type TeleEvents, type Theme,
@@ -23,6 +24,7 @@ const KIND_KEY = { audioinput: "microphone", audiooutput: "speaker", videoinput:
  * Attributes: features, lang, theme (light | dark | auto), layout (grid | speaker).
  * Events: tele-joined, tele-leave, tele-error, tele-participant, tele-chat.
  * Methods: leave(), setMicrophone(on), setCamera(on).
+ * Anyone's screen share takes the stage; each viewer can pin any tile (button on the tile, or double-click).
  */
 export class TeleCallElement extends LitElement {
   static override styles = styles;
@@ -40,7 +42,7 @@ export class TeleCallElement extends LitElement {
     // internal reactive state
     _micOn: { state: true }, _camOn: { state: true }, _micId: { state: true }, _camId: { state: true },
     _issues: { state: true }, _devices: { state: true }, _chatOpen: { state: true }, _draft: { state: true },
-    _menu: { state: true }, _menuError: { state: true }, _tick: { state: true },
+    _menu: { state: true }, _menuError: { state: true }, _tick: { state: true }, _pinned: { state: true },
   };
 
   declare features: string | null;
@@ -71,6 +73,8 @@ export class TeleCallElement extends LitElement {
   declare _menu: "audio" | "video" | null;
   declare _menuError: string | null;
   declare _tick: number;
+  /** Tile key (identity:source) this viewer pinned to the stage, or null. Local to this viewer. */
+  declare _pinned: string | null;
 
   private session: CallSession | null = null;
   private pre: { audio?: LocalAudioTrack; video?: LocalVideoTrack } = {};
@@ -94,6 +98,7 @@ export class TeleCallElement extends LitElement {
     this._menu = null;
     this._menuError = null;
     this._tick = 0;
+    this._pinned = null;
   }
 
   private get s(): Strings { return dictionary(this.lang, this.strings); }
@@ -322,41 +327,49 @@ export class TeleCallElement extends LitElement {
     </div></div>`;
   }
 
-  private tile(s: Strings, p: Participant, source: Track.Source, local: boolean) {
+  private tile(s: Strings, p: Participant, source: Track.Source, local: boolean, canPin: boolean) {
     const key = `${p.identity}:${source}`;
     const pub = p.getTrackPublication(source);
     // A camera turned off stays published but muted; show the initial instead of a frozen frame.
     const track = pub && !pub.isMuted ? pub.track : undefined;
     if (track) this.trackByKey.set(key, track); else this.trackByKey.delete(key);
     const screen = source === Track.Source.ScreenShare;
-    const name = (p.name || p.identity) + (local ? s.youSuffix : "") + (screen ? s.screenSuffix : "")
-      + (!p.isMicrophoneEnabled && !screen ? s.mutedSuffix : "");
+    const label = (p.name || p.identity) + (local ? s.youSuffix : "") + (screen ? s.screenSuffix : "");
+    const name = label + (!p.isMicrophoneEnabled && !screen ? s.mutedSuffix : "");
     const speaking = p.isSpeaking && !screen;
-    return html`<div class="tile ${speaking ? "speaking" : ""}" part="tile${speaking ? " tile-speaking" : ""}">
+    const pinned = this._pinned === key;
+    const pin = () => { this._pinned = togglePin(this._pinned, key); };
+    return html`<div class="tile ${speaking ? "speaking" : ""} ${pinned ? "pinned" : ""}" part="tile${speaking ? " tile-speaking" : ""}${pinned ? " tile-pinned" : ""}"
+      @dblclick=${canPin ? pin : nothing}>
       ${track
         ? html`<video data-key=${key} autoplay playsinline muted class="${screen ? "contain" : ""} ${local && !screen ? "mirror" : ""}"></video>`
         : html`<div class="avatar-wrap"><span class="avatar" part="avatar">${(p.name || p.identity).slice(0, 1).toUpperCase()}</span></div>`}
       <span class="name" part="tile-name">${name}</span>
+      ${canPin ? html`<button class="pin" part="tile-pin" aria-pressed=${pinned} title=${format(pinned ? s.unpin : s.pin, { name: label })}
+        aria-label=${format(pinned ? s.unpin : s.pin, { name: label })} @click=${pin}>${icon(pinned ? "PushPinFill" : "PushPin", 16)}</button>` : nothing}
     </div>`;
   }
 
   private renderStage(s: Strings, session: CallSession) {
     const tiles = session.tiles();
     const keyOf = (t: { p: Participant; source: Track.Source }) => `${t.p.identity}:${t.source}`;
-    if (this.layout === "speaker" && tiles.length > 1) {
-      const lp = session.room.localParticipant;
-      const speaker = session.room.activeSpeakers.find((p) => p !== lp) ?? session.room.activeSpeakers[0];
-      const main = tiles.find((t) => t.source === Track.Source.ScreenShare)
-        ?? tiles.find((t) => t.p === speaker && t.source === Track.Source.Camera)
-        ?? tiles.find((t) => !t.local && t.p.isCameraEnabled) ?? tiles.find((t) => !t.local) ?? tiles[0];
-      const rest = tiles.filter((t) => t !== main);
-      return html`<div class="speaker">
-        <div class="main">${this.tile(s, main.p, main.source, main.local)}</div>
-        <div class="strip">${repeat(rest, keyOf, (t) => this.tile(s, t.p, t.source, t.local))}</div>
+    const byKey = new Map(tiles.map((t) => [keyOf(t), t]));
+    const lp = session.room.localParticipant;
+    const speaker = session.room.activeSpeakers.find((p) => p !== lp) ?? session.room.activeSpeakers[0];
+    const { focus, rest } = arrange(
+      tiles.map((t) => ({ key: keyOf(t), screen: t.source === Track.Source.ScreenShare, local: t.local })),
+      { layout: this.layout, pinned: this._pinned, speaker: speaker ? `${speaker.identity}:${Track.Source.Camera}` : null },
+    );
+    const canPin = tiles.length > 1;
+    const draw = (k: string) => { const t = byKey.get(k)!; return this.tile(s, t.p, t.source, t.local, canPin); };
+    if (focus) {
+      return html`<div class="focus">
+        <div class="main">${draw(focus)}</div>
+        <div class="strip">${repeat(rest, (k) => k, draw)}</div>
       </div>`;
     }
-    const cols = tiles.length <= 1 ? "c1" : tiles.length <= 4 ? "c2" : "c3";
-    return html`<div class="grid ${cols}">${repeat(tiles, keyOf, (t) => this.tile(s, t.p, t.source, t.local))}</div>`;
+    const cols = rest.length <= 1 ? "c1" : rest.length <= 4 ? "c2" : "c3";
+    return html`<div class="grid ${cols}">${repeat(rest, (k) => k, draw)}</div>`;
   }
 
   private renderChat(s: Strings, session: CallSession) {

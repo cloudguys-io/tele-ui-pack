@@ -108,18 +108,33 @@ export const styles = css`
   button.banner { text-decoration: underline; color: var(--_text); width: 100%; }
 
   .body { position: relative; display: flex; min-height: 0; flex: 1; }
-  .stage { min-width: 0; flex: 1; overflow-y: auto; padding: 1rem; }
+  .stage { container: stage / inline-size; min-width: 0; flex: 1; overflow-y: auto; padding: 1rem; }
   .grid { display: grid; height: 100%; grid-auto-rows: 1fr; gap: .75rem; grid-template-columns: 1fr; }
   @container tele (min-width: 640px) { .grid.c2, .grid.c3 { grid-template-columns: repeat(2, 1fr); } }
   @container tele (min-width: 1024px) { .grid.c3 { grid-template-columns: repeat(3, 1fr); } }
-  .speaker { display: flex; height: 100%; flex-direction: column; gap: .75rem; }
-  .speaker .main { min-height: 0; flex: 1; display: grid; }
-  .speaker .strip { display: flex; gap: .75rem; overflow-x: auto; flex-shrink: 0; }
-  .speaker .strip .tile { width: 12rem; min-height: 7rem; height: 7rem; flex-shrink: 0; }
+  /* One tile large (a screen share, a pinned tile or the active speaker), the rest in a strip:
+     below it on narrow stages, beside it on wide ones. */
+  .focus { display: flex; height: 100%; flex-direction: column; gap: .75rem; }
+  .focus .main { min-height: 0; flex: 1; display: grid; }
+  .focus .main .tile { min-height: 0; }
+  .focus .strip { display: flex; gap: .75rem; overflow-x: auto; flex-shrink: 0; }
+  .focus .strip:empty { display: none; }
+  .focus .strip .tile { width: 12rem; min-height: 7rem; height: 7rem; flex-shrink: 0; }
+  @container stage (min-width: 900px) {
+    .focus { flex-direction: row; }
+    .focus .strip { flex-direction: column; width: 13rem; overflow-x: hidden; overflow-y: auto; }
+    .focus .strip .tile { width: 100%; height: 7.5rem; }
+  }
 
   .tile { position: relative; min-height: 10rem; overflow: hidden; border-radius: var(--_radius);
     background: var(--_surface); border: 1px solid var(--_line); }
   .tile.speaking { border-color: transparent; outline: 2px solid var(--_accent); }
+  .tile.pinned { border-color: var(--_text); }
+  .pin { position: absolute; top: .5rem; right: .5rem; display: grid; width: 2rem; height: 2rem; place-items: center;
+    border-radius: 9999px; background: rgb(0 0 0 / .55); color: #fff; opacity: 0; transition: opacity .15s; }
+  .tile:hover .pin, .pin:focus-visible, .tile.pinned .pin { opacity: 1; }
+  .pin:focus-visible { outline: 2px solid var(--_accent); outline-offset: 2px; }
+  @media (hover: none) { .pin { opacity: 1; } }
   .tile video { width: 100%; height: 100%; object-fit: cover; display: block; }
   .tile video.contain { object-fit: contain; }
   .tile video.mirror { transform: scaleX(-1); }
