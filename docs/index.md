@@ -5,7 +5,7 @@
 <div class="grid cards" markdown>
 
 - **Lobby** with camera preview and microphone, speaker and camera pickers
-- **Video tiles** in a grid or with the active speaker large
+- **Video tiles** in a grid or with the active speaker large; a screen share takes the stage, and anyone can pin a tile
 - **Screen share**, **chat** with saved history, and a **recording banner**
 - **Host controls** for recording and ending the call for everyone
 - **Reconnect handling** and clear messages when a call ends

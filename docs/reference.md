@@ -7,7 +7,7 @@
 | `features` | Space-separated: `lobby`, `chat`, `screenshare`, `devices`, `recording-indicator` | all of them |
 | `lang` | `en`, `bn` (a tag like `bn-BD` uses `bn`) | `en` |
 | `theme` | `light`, `dark`, `auto` (follows the system) | `auto` |
-| `layout` | `grid`, `speaker` (active speaker or screen share large, others in a strip) | `grid` |
+| `layout` | `grid` (even tiles), `speaker` (the active speaker large, others in a strip). In either layout someone else's screen share, or a tile you pinned, goes large | `grid` |
 
 Without `lobby`, the element joins as soon as `getJoin` is set and turns on the default microphone and camera.
 
@@ -52,3 +52,13 @@ All events bubble and cross the shadow boundary.
 ## Types
 
 The package exports TypeScript types for everything above: `JoinResponse`, `TeleEvents`, `Feature`, `Theme`, `Layout`, `Strings`, `DiagnosticBody`, `EndReason` and the element class `TeleCallElement`.
+
+## Stage and pinning
+
+What is shown large, in order:
+
+1. A tile the viewer pinned. Every tile has a pin button (shown on hover or focus, always on touch screens), and double-clicking a tile pins it too. Pinning the same tile again unpins it. Pins are per viewer and never sent to anyone else.
+2. Someone else's screen share. Your own share stays in the strip so you don't watch a copy of your screen; pin it if you want it large.
+3. In `speaker` layout, the active speaker.
+
+The other tiles sit in a strip below the large tile, or beside it once the stage is at least 900px wide. With nothing to show large, `grid` layout gives every tile the same size.

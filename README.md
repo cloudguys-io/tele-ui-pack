@@ -2,7 +2,7 @@
 
 `<tele-call>`: a complete call screen for [Tele](https://tele.cloudguys.io/) in one web component, plus a React wrapper.
 
-Lobby with device pickers, video tiles, screen share, chat with saved history, recording banner, host controls, reconnect handling, English and Bangla labels, and theming through CSS variables. It uses the join response your backend already gets from Tele, so it adds no new authentication and never sees your API secret.
+Lobby with device pickers, video tiles, screen share that takes the stage, pin any tile, chat with saved history, recording banner, host controls, reconnect handling, English and Bangla labels, and theming through CSS variables. It uses the join response your backend already gets from Tele, so it adds no new authentication and never sees your API secret.
 
 ```html
 <script type="module">

@@ -37,7 +37,7 @@ tele-call::part(button-primary) { text-transform: uppercase; }
 | Area | Parts |
 |---|---|
 | Layout | `call`, `header`, `stage`, `status`, `notice`, `recording` |
-| Tiles | `tile`, `tile-speaking`, `tile-name`, `avatar` |
+| Tiles | `tile`, `tile-speaking`, `tile-pinned`, `tile-name`, `tile-pin` (the pin button), `avatar` |
 | Controls | `controls`, `control`, `button`, `button-primary`, `leave`, `join`, `device-menu`, `select` |
 | Chat | `chat`, `chat-bubble`, `chat-bubble-mine`, `input` |
 | Lobby | `lobby`, `preview` |
