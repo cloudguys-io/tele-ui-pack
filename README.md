@@ -23,7 +23,7 @@ import { TeleCall } from "@tele/call-ui/react";
 ## Install
 
 ```bash
-npm install github:cloudguys-io/tele-ui-pack#v0.2.0 livekit-client
+npm install github:cloudguys-io/tele-ui-pack#v0.2.1 livekit-client
 ```
 
 Or build once and serve `dist/tele-call.iife.js`, a single file for a `<script>` tag.
@@ -49,6 +49,10 @@ npm run build
 ```
 
 ## Changelog
+
+### 0.2.1
+
+- Released under the MIT license; the repository is public. No code changes.
 
 ### 0.2.0
 

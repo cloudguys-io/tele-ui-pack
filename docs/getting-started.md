@@ -11,7 +11,7 @@
 The package is not on a public registry. Install it from this repository at a release tag; npm builds it on install.
 
 ```bash
-npm install github:cloudguys-io/tele-ui-pack#v0.2.0 livekit-client
+npm install github:cloudguys-io/tele-ui-pack#v0.2.1 livekit-client
 ```
 
 !!! tip "No bundler?"
