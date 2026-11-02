@@ -62,4 +62,4 @@ npm run build
 
 ## License
 
-Proprietary. Copyright CloudGuys. Use requires an agreement with the Tele team.
+MIT. See [LICENSE](LICENSE).

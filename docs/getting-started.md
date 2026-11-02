@@ -14,8 +14,6 @@ The package is not on a public registry. Install it from this repository at a re
 npm install github:cloudguys-io/tele-ui-pack#v0.2.0 livekit-client
 ```
 
-You need read access to the repository (ask the Tele team). For CI, use a deploy key or a token with read access.
-
 !!! tip "No bundler?"
     Build once (`npm ci && npm run build` in a clone) and serve `dist/tele-call.iife.js` as a static file. It includes `livekit-client`, so a single `<script>` tag is enough. See [Plain HTML](html.md).
 
