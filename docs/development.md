@@ -38,8 +38,8 @@ npm run docs:build  # static site in site/
 
 1. Bump `version` in `package.json` and note the change in the README's changelog.
 2. `npm test && npm run build`.
-3. Tag and push: `git tag v0.2.0 && git push --tags`.
-4. Consumers move to the new tag: `npm install github:cloudguys-io/tele-ui-pack#v0.2.0`.
+3. Tag and push: `git tag vX.Y.Z && git push --tags`.
+4. Consumers move to the new tag: `npm install github:cloudguys-io/tele-ui-pack#vX.Y.Z`.
 
 ## Rules
 

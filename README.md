@@ -23,7 +23,7 @@ import { TeleCall } from "@tele/call-ui/react";
 ## Install
 
 ```bash
-npm install github:cloudguys-io/tele-ui-pack#v0.1.0 livekit-client
+npm install github:cloudguys-io/tele-ui-pack#v0.2.0 livekit-client
 ```
 
 Or build once and serve `dist/tele-call.iife.js`, a single file for a `<script>` tag.
@@ -49,6 +49,12 @@ npm run build
 ```
 
 ## Changelog
+
+### 0.2.0
+
+- Someone else's screen share takes the stage in any layout, with the other tiles in a strip (below it, or beside it from 900px wide).
+- Pin any tile with its pin button or a double-click; a pin beats a screen share and the active speaker. Pins are per viewer.
+- New parts `tile-pinned` and `tile-pin`; pin and unpin labels in English and Bangla.
 
 ### 0.1.0
 
